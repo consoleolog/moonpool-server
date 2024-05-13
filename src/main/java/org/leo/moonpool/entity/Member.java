@@ -2,8 +2,10 @@ package org.leo.moonpool.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Builder
@@ -34,16 +36,16 @@ public class Member {
     @Builder.Default
     private Integer coin = 1000;
 
-    @ToString.Exclude
-    @ElementCollection(fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<MemberRole> memberRoleList = new ArrayList<>();
+//    @ToString.Exclude
+//    @ElementCollection(fetch = FetchType.LAZY)
+//    @Builder.Default
+//    private List<MemberRole> memberRoleList = new ArrayList<>();
 
     public void changeUsername(String username) {
         this.username = username;
     }
-    public String changePassword() {
-        return password;
+    public void changePassword() {
+        this.password = password;
     }
     public void changePassword(String password) {
         this.password = password;

@@ -1,6 +1,7 @@
 package org.leo.moonpool.dto;
 
 import lombok.*;
+import org.leo.moonpool.entity.Problem;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -41,6 +42,16 @@ public class ProblemDto {
     @Builder.Default
     private List<String> answerFileNames = new ArrayList<>();
 
-
+    public Problem toEntity(ProblemDto problemDto){
+        return Problem.builder()
+                .title(problemDto.getTitle())
+                .price(problemDto.getPrice())
+                .description(problemDto.getDescription())
+                .category(problemDto.getCategory())
+                .level(problemDto.getLevel())
+                .answer(problemDto.getAnswer())
+                .writerId(problemDto.getWriterId())
+                .build();
+    }
 
 }

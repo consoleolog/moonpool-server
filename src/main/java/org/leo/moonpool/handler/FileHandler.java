@@ -1,6 +1,9 @@
 package org.leo.moonpool.handler;
 
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import org.leo.moonpool.entity.AnswerImage;
+import org.leo.moonpool.entity.QuizImage;
 import org.springframework.core.io.Resource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
@@ -18,10 +21,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Component
 public class FileHandler {
     @Value("${com.moonpool.upload.path}")
     private String uploadPath;
+
+    public void addQuizImageString(String fileName){
+        QuizImage quizImage = QuizImage.builder()
+                .quizName(fileName)
+                .build();
+    }
+    public void addAnswerImageString(String fileName){
+        AnswerImage answerImage = AnswerImage.builder()
+                .answerName(fileName)
+                .build();
+    }
     @PostConstruct
     public void folderInit(){
         File saveFolder = new File(uploadPath);
@@ -72,6 +87,8 @@ public class FileHandler {
             Path savePath = Paths.get(uploadPath, imgFileName);
         });
     }
+
+
 
 
 

@@ -1,6 +1,6 @@
 package org.leo.moonpool.entity;
 
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Builder
@@ -9,6 +9,6 @@ import lombok.*;
 @ToString
 @Getter
 @Embeddable
-public class QuizFile {
+public class QuizImage {
     private String quizName;
 }

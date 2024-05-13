@@ -2,6 +2,7 @@ package org.leo.moonpool.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.leo.moonpool.dto.ProblemDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,25 +31,19 @@ public class Problem {
     @Column(length = 10)
     private String level;
 
-    @ElementCollection
-    @Builder.Default
-    @ToString.Exclude
-    private List<Quiz> quizList = new ArrayList<>();
-
-    @ElementCollection
-    @Builder.Default
-    @ToString.Exclude
-    private List<Answer> answerList = new ArrayList<>();
-
     private Integer answer;
-
-//    @ToString.Exclude
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "writer_id",foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-//    private Member member;
 
     private Long writerId;
 
+    @ToString.Exclude
+    @ElementCollection
+    @Builder.Default
+    private List<QuizImage> quizList = new ArrayList<>();
+
+    @ToString.Exclude
+    @ElementCollection
+    @Builder.Default
+    private List<AnswerImage> answerList = new ArrayList<>();
 
     public void changeTitle(String title) {
         this.title = title;
@@ -77,25 +72,24 @@ public class Problem {
     @Builder.Default
     private Boolean delFlag = false;
 
-    public void addQuiz(Quiz quizImgName){
-        quizList.add(quizImgName);
+
+    public void clearQuizList(){
+        this.quizList.clear();
     }
-    public void addQuizImgString(String quizImgName){
-        Quiz quizImg = Quiz.builder()
-                .quizName(quizImgName)
+    public void clearAnswerList(){
+        this.answerList.clear();
+    }
+
+    public void addQuizImageString(String fileName){
+        QuizImage quizImage = QuizImage.builder()
+                .quizName(fileName)
                 .build();
-        addQuiz(quizImg);
+        quizList.add(quizImage);
     }
-    public void addAnswer(Answer answerImgName){
-        answerList.add(answerImgName);
-    }
-    public void addAnswerImgString(String answerImgName){
-        Answer answerImg = Answer.builder()
-                .answerName(answerImgName)
+    public void addAnswerImageString(String fileName){
+        AnswerImage answerImage = AnswerImage.builder()
+                .answerName(fileName)
                 .build();
-        addAnswer(answerImg);
+        answerList.add(answerImage);
     }
-
-
-
 }
