@@ -27,10 +27,14 @@ public class FileHandler {
     @Value("${com.moonpool.upload.path}")
     private String uploadPath;
 
+    public void addQuizImage(QuizImage quizImage){
+
+    }
     public void addQuizImageString(String fileName){
         QuizImage quizImage = QuizImage.builder()
                 .quizName(fileName)
                 .build();
+
     }
     public void addAnswerImageString(String fileName){
         AnswerImage answerImage = AnswerImage.builder()
@@ -57,6 +61,7 @@ public class FileHandler {
             try {
                 Files.copy(file.getInputStream(),savePath);
                 file.transferTo(savePath);
+                imgNames.add(savedName);
             } catch (IOException e){
                 throw new RuntimeException(e);
             }

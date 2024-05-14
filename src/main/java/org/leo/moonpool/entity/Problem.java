@@ -72,6 +72,25 @@ public class Problem {
     @Builder.Default
     private Boolean delFlag = false;
 
+    public ProblemDto toDto(Problem problem){
+        ProblemDto problemDto = ProblemDto.builder()
+                .problemId(problem.getProblemId())
+                .title(problem.getTitle())
+                .price(problem.getPrice())
+                .description(problem.getDescription())
+                .category(problem.getCategory())
+                .level(problem.getLevel())
+                .answer(problem.getAnswer())
+                .writerId(problem.getWriterId())
+                .build();
+        List<QuizImage> quizList = problem.getQuizList();
+        if (quizList == null || quizList.isEmpty()){
+            return problemDto;
+        }
+        List<String> quizNameList = quizList.stream().map(QuizImage::getQuizName).toList();
+        problemDto.setQuizFileNames(quizNameList);
+        return problemDto;
+    }
 
     public void clearQuizList(){
         this.quizList.clear();

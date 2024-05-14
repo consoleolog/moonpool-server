@@ -43,7 +43,7 @@ public class ProblemDto {
     private List<String> answerFileNames = new ArrayList<>();
 
     public Problem toEntity(ProblemDto problemDto){
-        return Problem.builder()
+         Problem problem = Problem.builder()
                 .title(problemDto.getTitle())
                 .price(problemDto.getPrice())
                 .description(problemDto.getDescription())
@@ -52,6 +52,18 @@ public class ProblemDto {
                 .answer(problemDto.getAnswer())
                 .writerId(problemDto.getWriterId())
                 .build();
+        List<String> quizNames = problemDto.getQuizFileNames();
+        List<String> answerNames = problemDto.getAnswerFileNames();
+        if(quizNames == null || quizNames.isEmpty()||answerNames == null || answerNames.isEmpty()){
+            return problem;
+        }
+        quizNames.forEach(names -> {
+            problem.addQuizImageString(names);
+        });
+        answerNames.forEach(names -> {
+            problem.addAnswerImageString(names);
+        });
+        return problem;
     }
 
 }

@@ -1,6 +1,7 @@
 package org.leo.moonpool.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.leo.moonpool.dto.ApiUser;
 import org.leo.moonpool.entity.Member;
 import org.leo.moonpool.repository.MemberRepository;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+@Log4j2
 @RequiredArgsConstructor
 @Service
 public class UsersDetailService implements UserDetailsService {
@@ -29,16 +30,15 @@ public class UsersDetailService implements UserDetailsService {
         Member user = result.get();
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        ApiUser apiUser = new ApiUser(
-                result.get().getMemberId(),
-                result.get().getUsername(),
-                result.get().getPassword(),
-                result.get().getDisplayName(),
-                result.get().getIntro(),
-                result.get().getEducationState(),
-                result.get().getCoin(),
-                authorities
-        );
+        ApiUser apiUser = new ApiUser(user.getUsername(),user.getPassword(),authorities);
+        apiUser.setMemberId(user.getMemberId());
+        apiUser.setUsername(user.getUsername());
+        apiUser.setPassword(user.getPassword());
+        apiUser.setDisplayName(user.getDisplayName());
+        apiUser.setIntro(user.getIntro());
+        apiUser.setEducationState(user.getEducationState());
+        apiUser.setCoin(user.getCoin());
+        log.info(apiUser);
         return apiUser;
     }
 }

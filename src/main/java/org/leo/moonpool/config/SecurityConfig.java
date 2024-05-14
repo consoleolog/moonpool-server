@@ -50,11 +50,6 @@ public class SecurityConfig {
             formLogin.successHandler(new LoginSuccessHandler());
             formLogin.failureHandler(new LoginFailHandler());
         });
-//        http.logout(logout->{
-//            logout.logoutUrl("/mp/members/logout");
-//            logout.logoutSuccessUrl("mp/members/");
-////            logout.addLogoutHandler(new LogoutSucessHandler());
-//        });
         // UsernamePasswordAuthenticationFilter.class 전에 jwtcheckfilter 실행 시켜줘
         http.addFilterBefore(new JwtCheckFilter(), UsernamePasswordAuthenticationFilter.class);
         //멤버 권한 예외 전역 처리

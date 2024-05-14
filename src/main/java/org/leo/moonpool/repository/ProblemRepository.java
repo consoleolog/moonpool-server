@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ProblemRepository extends JpaRepository<Problem, Long> {
 
-    @Query(value = "SELECT p FROM Problem p WHERE p.category=:category ORDER BY p.problemId DESC LIMIT 20 OFFSET :offset")
+    @Query(value = "SELECT p FROM Problem p WHERE p.category=:category AND p.delFlag=false ORDER BY p.problemId DESC LIMIT 20 OFFSET :offset")
     List<?> customeFindAll(@Param("category")String category,@Param("offset") int offset);
 
     @Query(value = "SELECT COUNT (p) FROM Problem p WHERE p.category=:category")

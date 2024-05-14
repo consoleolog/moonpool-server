@@ -1,6 +1,7 @@
 package org.leo.moonpool.dto;
 
 import lombok.*;
+import org.leo.moonpool.entity.Sales;
 
 @Builder
 @NoArgsConstructor
@@ -14,4 +15,11 @@ public class SalesDto {
     private Long problemId;
 
     private Long memberId;
+
+    public Sales toEntity(SalesDto salesDto){
+        return Sales.builder()
+                .problemId(salesDto.getProblemId())
+                .memberId(salesDto.getMemberId())
+                .build();
+    }
 }

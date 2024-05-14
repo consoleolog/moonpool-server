@@ -1,17 +1,17 @@
 package org.leo.moonpool.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.leo.moonpool.dto.ProblemDto;
 import org.leo.moonpool.entity.Problem;
 import org.leo.moonpool.handler.FileHandler;
 import org.leo.moonpool.repository.ProblemRepository;
 import org.leo.moonpool.service.impl.ProblemService;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.IntStream;
-
+@Log4j2
 @RequiredArgsConstructor
 @Service
 public class ProblemServiceImpl implements ProblemService {
@@ -19,8 +19,6 @@ public class ProblemServiceImpl implements ProblemService {
     private final FileHandler fileHandler;
     @Override
     public String post(ProblemDto problemDto) {
-        List<MultipartFile> quizList = problemDto.getQuizFiles();
-        List<MultipartFile> answerList = problemDto.getAnswerFiles();
         if(problemDto.getTitle().isEmpty()){
             return "Title_Blank";
         } else if (problemDto.getPrice().toString().isEmpty()) {
@@ -31,21 +29,10 @@ public class ProblemServiceImpl implements ProblemService {
             return "Category_Blank";
         } else if (problemDto.getAnswer().toString().isEmpty()) {
             return "Answer_Blank";
-        } else if (quizList.isEmpty()) {
-            return "QuizList_Blank";
-        } else if (answerList.isEmpty()) {
-            return "AnswerList_Blank";
         }
-        List<String> quizNames = fileHandler.saveFiles(quizList);
-        List<String> answerNames = fileHandler.saveFiles(answerList);
-        quizNames.forEach(names -> {
-            fileHandler.addQuizImageString(names);
-        });
-        answerNames.forEach(names -> {
-            fileHandler.addAnswerImageString(names);
-        });
         Problem result = problemRepository.save(problemDto.toEntity(problemDto));
         return result.getCategory();
+//        return null;
     }
     @Override
     public String modify(ProblemDto problemDto) {
@@ -68,10 +55,10 @@ public class ProblemServiceImpl implements ProblemService {
     }
 
     @Override
-    public Problem getOne(Long problemId) {
+    public ProblemDto getOne(Long problemId) {
         Optional<Problem> result = problemRepository.findById(problemId);
         Problem problem =result.orElseThrow();
-        return problem;
+        return problem.toDto(problem);
     }
 
     @Override

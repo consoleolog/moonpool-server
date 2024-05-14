@@ -2,7 +2,6 @@ package org.leo.moonpool.service.impl;
 
 import jakarta.transaction.Transactional;
 import org.leo.moonpool.dto.ProblemDto;
-import org.leo.moonpool.entity.Problem;
 
 import java.util.Map;
 
@@ -15,7 +14,7 @@ public interface ProblemService {
 
     Boolean delete(Long problemId);
 
-    Problem getOne(Long problemId);
+    ProblemDto getOne(Long problemId);
 
     Map<String, Object> getList(Integer pageNum, String category);
 

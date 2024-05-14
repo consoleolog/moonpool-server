@@ -4,16 +4,19 @@ import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.log4j.Log4j2;
 import org.leo.moonpool.config.JwtConfig;
 import org.leo.moonpool.dto.ApiUser;
 import org.springframework.security.core.Authentication;
+
+
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
-
+@Log4j2
 @Service
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     @Override

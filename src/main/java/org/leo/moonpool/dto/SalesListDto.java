@@ -1,8 +1,14 @@
 package org.leo.moonpool.dto;
 
-import java.util.List;
+import lombok.*;
 
+import java.util.List;
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class SalesListDto {
     private List<Long> problemIdList;
     private Long memberId;
+
 }

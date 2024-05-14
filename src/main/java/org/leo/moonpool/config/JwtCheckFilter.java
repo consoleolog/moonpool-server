@@ -6,12 +6,17 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
+import org.leo.moonpool.dto.ApiUser;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +25,7 @@ public class JwtCheckFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws SecurityException {
         String path = request.getRequestURI();
-        if (path.startsWith("/mp/members/")|| path.startsWith("/mp/problems") ||path.startsWith("/mp/carts/delete/all")){
+        if (path.startsWith("/mp/members/login")|| path.startsWith("/mp/problems")){
             return true;
         } else if (path.startsWith("/mp/comments")){
             return true;
@@ -29,21 +34,48 @@ public class JwtCheckFilter extends OncePerRequestFilter {
     }
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)throws ServletException, IOException {
-        // 로그인 경로로 post 요청하면 실행할 코드
+        // 필터 체크하는 함수
         String authHeader = request.getHeader("Authorization");
-        log.info("----------------------------------dofilter");
+        log.info("-----------------check filter start--------------------");
         try {
             // Bearer 타입( 공식 문서에 이렇게 쓰라네)
-            log.info(authHeader);
             String accessToken = authHeader.substring(7);
             Map<String, Object> claims = JwtConfig.validateToken(accessToken);
+            var result = claims.get("memberId").toString();
+            Long memberId = Long.valueOf(result);
 
-//            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDto,password,userDto.getAuthorities());
-//            log.info(authenticationToken);
-//             인증 완료하면 contextholder 에 userdto 를 저장
-//            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-//            filterChain.doFilter(request, response);
+            String username = claims.get("username").toString();
 
+            String password = claims.get("password").toString();
+
+            String displayName = claims.get("displayName").toString();
+
+            String intro = claims.get("intro").toString();
+
+            String educationState = claims.get("educationState").toString();
+
+            Integer coin = (Integer) claims.get("coin");
+
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+            ApiUser apiUser = new ApiUser(username,password, authorities);
+            apiUser.setMemberId(memberId);
+            apiUser.setUsername(username);
+            apiUser.setIntro(intro);
+            apiUser.setDisplayName(displayName);
+            apiUser.setEducationState(educationState);
+            apiUser.setCoin(coin);
+
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(apiUser,password,apiUser.getAuthorities());
+
+////             인증 완료하면 contextholder 에 userdto 를 저장
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(authenticationToken);
+            SecurityContextHolder.setContext(context);
+
+            filterChain.doFilter(request, response);
+            log.info("-----------------check filter end--------------------");
         } catch (Exception e){
             Gson gson = new Gson();
             String message = gson.toJson(Map.of("Error","Error_Access_Token"));
