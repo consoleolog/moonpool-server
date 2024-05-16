@@ -35,4 +35,9 @@ public class CartController {
         String result = cartService.deleteAll(memberId);
         return ResponseEntity.ok(result);
     }
+    @PostMapping("/mp/carts/register-check")
+    public ResponseEntity<String> registerCheck(@RequestBody CartDto cartDto){
+        String result = cartService.alreadyRegister(cartDto);
+        return ResponseEntity.ok(result);
+    }
 }

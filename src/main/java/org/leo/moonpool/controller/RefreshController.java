@@ -17,11 +17,11 @@ import java.util.Map;
 @RestController
 public class RefreshController {
     @GetMapping("/mp/refresh")
-    public Map<String, Object> refresh(@RequestHeader("Authorization") String authHeader,
-                                       String refreshToken){
+    public Map<String, Object> refresh(@RequestHeader("Authorization") String authHeader, String refreshToken){
+        log.info("------------------------------refresh controller start--------------------------------------");
         log.info(authHeader);
         log.info(refreshToken);
-        if (refreshToken==null){
+        if (refreshToken == null){
             throw new JwtException("Refresh_Token is Null");
         }
         if (authHeader == null || authHeader.length() < 7){
@@ -31,12 +31,14 @@ public class RefreshController {
         log.info("accesstoken"+accessToken);
         // AccessToken 만료 여부 확인
         if (!checkExpiredToken(accessToken)){
+            log.info("------------------------------not expired refresh controller end--------------------------------------");
             return Map.of("AccessToken",accessToken,"RefreshToken",refreshToken);
         }
         // Refresh 토큰 검증 checkexpired 가 true 면 실행할 코드
         Map<String, Object> claims = JwtConfig.validateToken(refreshToken);
         String newAccessToken = JwtConfig.generateToken(claims,10);
         String newRefreshToken = JwtConfig.generateToken(claims, 60 * 24);
+        log.info("------------------------------yes expired refresh controller end--------------------------------------");
         return Map.of("AccessToken",newAccessToken,"RefreshToken",newRefreshToken);
     }
     private Boolean checkTime(Integer exp){
@@ -47,7 +49,7 @@ public class RefreshController {
         // 60분이 남았는지 안남았는지
         return leftMin < 60;
     }
-    // expried 라는 메시지면 새로 발급해줄게
+    // expired 라는 메시지면 새로 발급해줄게
     private Boolean checkExpiredToken(String token){
         try {
             JwtConfig.validateToken(token);

@@ -1,7 +1,6 @@
 package org.leo.moonpool.repository;
 
 import org.leo.moonpool.entity.Problem;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,6 +14,5 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
 
     @Query(value = "SELECT COUNT (p) FROM Problem p WHERE p.category=:category")
     Long countByCategory(@Param("category") String category);
-
 
 }

@@ -10,7 +10,7 @@ import org.leo.moonpool.entity.Sales;
 @Data
 public class SalesDto {
 
-    private Long id;
+    private Long salesId;
 
     private Long problemId;
 

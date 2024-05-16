@@ -35,6 +35,10 @@ public class Problem {
 
     private Long writerId;
 
+
+    @Builder.Default
+    private Boolean delFlag = false;
+
     @ToString.Exclude
     @ElementCollection
     @Builder.Default
@@ -69,8 +73,9 @@ public class Problem {
         this.answer = answer;
     }
 
-    @Builder.Default
-    private Boolean delFlag = false;
+    public void changeDelFlag(){
+         this.delFlag = true;
+    }
 
     public ProblemDto toDto(Problem problem){
         ProblemDto problemDto = ProblemDto.builder()
@@ -89,6 +94,8 @@ public class Problem {
         }
         List<String> quizNameList = quizList.stream().map(QuizImage::getQuizName).toList();
         problemDto.setQuizFileNames(quizNameList);
+        List<String> answerNameList =answerList.stream().map(AnswerImage::getAnswerName).toList();
+        problemDto.setAnswerFileNames(answerNameList);
         return problemDto;
     }
 

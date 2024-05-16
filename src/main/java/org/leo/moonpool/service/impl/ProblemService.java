@@ -12,7 +12,7 @@ public interface ProblemService {
 
     String modify(ProblemDto problemDto);
 
-    Boolean delete(Long problemId);
+    String delete(Long problemId,Long memberId);
 
     ProblemDto getOne(Long problemId);
 

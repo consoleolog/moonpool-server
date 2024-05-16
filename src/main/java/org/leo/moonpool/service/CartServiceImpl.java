@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 @Log4j2
 @RequiredArgsConstructor
 @Service
@@ -56,5 +58,24 @@ public class CartServiceImpl implements CartService {
         }
         return "ERROR";
     }
+
+    @Override
+    public String alreadyRegister(CartDto cartDto) {
+        // 문제 아이디를 받아와서 이게 회원의 장바구니에 있는지 없는지 확인해주는거임
+        // 회원 검증
+        Boolean validCheck = memberHandler.validCheck(cartDto.getOwnerId());
+        if ( !validCheck){
+            return "VALID_ERROR";
+        }
+        // 장바구니에 있는지 없는지 확인
+        List<Long> cartItemList = cartRepository.customFindByMemberId(cartDto.getOwnerId());
+        for ( Long problemId:cartItemList ){
+            if(Objects.equals(problemId, cartDto.getProblemId())){
+                return "ALREADY_EXIST";
+            }
+        }
+        return "SUCCESS";
+    }
+
 
 }

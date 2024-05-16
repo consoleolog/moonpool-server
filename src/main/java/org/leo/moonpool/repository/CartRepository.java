@@ -18,4 +18,7 @@ public interface CartRepository extends JpaRepository<Cart,Long> {
     @Modifying
     @Query(value = "DELETE FROM cart WHERE cart.owner_id =?1",nativeQuery = true)
     int customDeleteAll(Long id);
+
+    @Query(value = "SELECT c.problemId FROM Cart c WHERE c.ownerId=:memberId")
+    List<Long> customFindByMemberId(@Param("memberId")Long memberId);
 }

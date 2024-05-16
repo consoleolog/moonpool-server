@@ -25,21 +25,20 @@ public class JwtCheckFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws SecurityException {
         String path = request.getRequestURI();
-        if (path.startsWith("/mp/members/login")|| path.startsWith("/mp/problems")){
-            return true;
-        } else if (path.startsWith("/mp/comments")){
+        if (path.startsWith("/mp/members/login")|| path.startsWith("/mp/problems")||path.startsWith("/mp/comments")){
             return true;
         }
         return false;
     }
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // 필터 체크하는 함수
         String authHeader = request.getHeader("Authorization");
         log.info("-----------------check filter start--------------------");
         try {
             // Bearer 타입( 공식 문서에 이렇게 쓰라네)
             String accessToken = authHeader.substring(7);
+            log.info(accessToken);
             Map<String, Object> claims = JwtConfig.validateToken(accessToken);
             var result = claims.get("memberId").toString();
             Long memberId = Long.valueOf(result);
@@ -58,7 +57,7 @@ public class JwtCheckFilter extends OncePerRequestFilter {
 
             List<GrantedAuthority> authorities = new ArrayList<>();
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-
+            log.info(authorities);
             ApiUser apiUser = new ApiUser(username,password, authorities);
             apiUser.setMemberId(memberId);
             apiUser.setUsername(username);
@@ -66,23 +65,25 @@ public class JwtCheckFilter extends OncePerRequestFilter {
             apiUser.setDisplayName(displayName);
             apiUser.setEducationState(educationState);
             apiUser.setCoin(coin);
-
+            log.info(apiUser);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(apiUser,password,apiUser.getAuthorities());
-
-////             인증 완료하면 contextholder 에 userdto 를 저장
+            log.info(authenticationToken);
+            // 인증 완료하면 contextholder 에 userdto 를 저장
             SecurityContext context = SecurityContextHolder.createEmptyContext();
             context.setAuthentication(authenticationToken);
             SecurityContextHolder.setContext(context);
-
+            log.info(context);
             filterChain.doFilter(request, response);
             log.info("-----------------check filter end--------------------");
         } catch (Exception e){
+            log.info("------------------accesstoken error start---------------------------------");
             Gson gson = new Gson();
             String message = gson.toJson(Map.of("Error","Error_Access_Token"));
             response.setContentType("application/json");
             PrintWriter printWriter = response.getWriter();
             printWriter.println(message);
             printWriter.close();
+            log.info("------------------accesstoken error end---------------------------------");
         }
     }
 }

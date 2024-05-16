@@ -2,11 +2,14 @@ package org.leo.moonpool.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.leo.moonpool.dto.ApiUser;
 import org.leo.moonpool.dto.ProblemDto;
 import org.leo.moonpool.entity.Problem;
 import org.leo.moonpool.handler.FileHandler;
+import org.leo.moonpool.handler.MemberHandler;
 import org.leo.moonpool.repository.ProblemRepository;
 import org.leo.moonpool.service.impl.ProblemService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -17,8 +20,19 @@ import java.util.stream.IntStream;
 public class ProblemServiceImpl implements ProblemService {
     private final ProblemRepository problemRepository;
     private final FileHandler fileHandler;
+    private final MemberHandler memberHandler;
     @Override
     public String post(ProblemDto problemDto) {
+        log.info("------------ post service start  -------------");
+        log.info(problemDto);
+        log.info(problemDto.getWriterId());
+        ApiUser a =(ApiUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        log.info(a.getMemberId());
+
+//        Boolean validCheck = memberHandler.validCheck(problemDto.getWriterId());
+//        if (!validCheck){
+//            return "VALID_ERROR";
+//        }
         if(problemDto.getTitle().isEmpty()){
             return "Title_Blank";
         } else if (problemDto.getPrice().toString().isEmpty()) {
@@ -36,6 +50,10 @@ public class ProblemServiceImpl implements ProblemService {
     }
     @Override
     public String modify(ProblemDto problemDto) {
+        Boolean validCheck = memberHandler.validCheck(problemDto.getWriterId());
+        if (!validCheck){
+            return "VALID_ERROR";
+        }
         Optional<Problem> result = problemRepository.findById(problemDto.getProblemId());
         if (result.isPresent()){
             Problem problem = result.get();
@@ -45,13 +63,38 @@ public class ProblemServiceImpl implements ProblemService {
             problem.changeCategory(problemDto.getCategory());
             problem.changeAnswer(problemDto.getAnswer());
             problem.changeLevel(problemDto.getLevel());
+            List<String> quizNames = problemDto.getQuizFileNames();
+            List<String> answerNames = problemDto.getAnswerFileNames();
+            problem.clearAnswerList();
+            problem.clearQuizList();
+            if(quizNames == null || quizNames.isEmpty()||answerNames == null || answerNames.isEmpty()){
+                problemRepository.save(problem);
+                return "SUCCESS";
+            }
+            quizNames.forEach(names->{
+                problem.addQuizImageString(names);
+            });
+            answerNames.forEach(names->{
+                problem.addAnswerImageString(names);
+            });
+            problemRepository.save(problem);
         }
-        return null;
+        return "SUCCESS";
     }
 
     @Override
-    public Boolean delete(Long problemId) {
-        return null;
+    public String delete(Long problemId,Long memberId) {
+        Boolean validCheck = memberHandler.validCheck(memberId);
+        if(!validCheck){
+            return "VALID_ERROR";
+        }
+        Optional<Problem> result = problemRepository.findById(problemId);
+        if (result.isPresent()){
+            Problem problem = result.get();
+            problem.changeDelFlag();
+            problemRepository.save(problem);
+        }
+        return "SUCCESS";
     }
 
     @Override
@@ -84,4 +127,5 @@ public class ProblemServiceImpl implements ProblemService {
         result.put("numList",numList);
         return result;
     }
+
 }
