@@ -25,7 +25,7 @@ public class JwtCheckFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws SecurityException {
         String path = request.getRequestURI();
-        if (path.startsWith("/mp/members/login")|| path.startsWith("/mp/problems")||path.startsWith("/mp/comments")){
+        if (path.startsWith("/mp/members")|| path.startsWith("/mp/problems")||path.startsWith("/mp/comments")){
             return true;
         }
         return false;

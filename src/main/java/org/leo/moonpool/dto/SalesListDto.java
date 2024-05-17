@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 public class SalesListDto {
     private List<Long> problemIdList;
+    private Integer totalPrice;
     private Long memberId;
 
 }

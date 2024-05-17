@@ -21,12 +21,17 @@ public class SalesController {
         String result = salesService.purchase(salesDto);
         return ResponseEntity.ok(result);
     }
-    @PostMapping("/mp/sales/purchase/all")
+    @PostMapping("/mp/sales/purchased-check")
+    public ResponseEntity<String> purchasedCheckAll(@RequestBody SalesListDto salesListDto){
+        String result = salesService.purchaseCheckAll(salesListDto);
+        return ResponseEntity.ok(result);
+    }
+    @PostMapping("/mp/sales/purchase-all")
     public ResponseEntity<?> purchaseAll(@RequestBody SalesListDto salesListDto){
         String result = salesService.purchaseAll(salesListDto);
         return ResponseEntity.ok(result);
     }
-    @PostMapping("/mp/problems/answer/check")
+    @PostMapping("/mp/sales/answer/check")
     public ResponseEntity<?> answerCheck(@RequestBody AnswerDto answerDto){
         String result = salesService.answerCheck(answerDto);
         return ResponseEntity.ok(result);

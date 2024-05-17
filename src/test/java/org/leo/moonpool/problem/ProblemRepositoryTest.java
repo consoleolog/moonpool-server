@@ -31,8 +31,8 @@ public class ProblemRepositoryTest {
                     .answer(i)
                     .writerId(1L)
                     .build();
-            problem.addQuizImageString("koreanQTestImg"+i+".png");
-            problem.addAnswerImageString("koreanATestImg"+i+"png");
+            problem.addQuizImageString("koreanQTestImg.png");
+            problem.addAnswerImageString("koreanATestImg.png");
             problemRepository.save(problem);
         }
         for (int i = 99; i < 200; i++) {
@@ -45,8 +45,8 @@ public class ProblemRepositoryTest {
                     .answer(i)
                     .writerId(2L)
                     .build();
-            problem.addQuizImageString("mathQTestImg"+i+".png");
-            problem.addAnswerImageString("mathATestImg"+i+"png");
+            problem.addQuizImageString("mathQTestImg.png");
+            problem.addAnswerImageString("mathATestImg.png");
             problemRepository.save(problem);
         }
         for (int i = 199; i < 300; i++) {
@@ -59,8 +59,8 @@ public class ProblemRepositoryTest {
                     .answer(i)
                     .writerId(3L)
                     .build();
-            problem.addQuizImageString("englishQTestImg"+i+".png");
-            problem.addAnswerImageString("englishATestImg"+i+"png");
+            problem.addQuizImageString("englishQTestImg.png");
+            problem.addAnswerImageString("englishATestImg.png");
             problemRepository.save(problem);
         }
     }
@@ -69,5 +69,11 @@ public class ProblemRepositoryTest {
     public void testFind(){
 //        var result = problemRepository.customeFindAll();
 //        System.out.println(result);
+    }
+    @Test
+    public void testSearch(){
+        String text = "국어";
+        var result = problemRepository.fullTextSearch(text,0);
+        System.out.println(result);
     }
 }

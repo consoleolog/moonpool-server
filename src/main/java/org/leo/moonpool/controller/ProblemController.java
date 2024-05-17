@@ -46,6 +46,12 @@ public class ProblemController {
         var result = problemService.getList(pageNum,category);
         return ResponseEntity.ok(result);
     }
+    @GetMapping("/mp/problems/{pageNum}/")
+    public ResponseEntity<Map<String,Object>> search(@PathVariable("pageNum")Integer pageNum,
+                                                     @RequestParam("searchText") String searchText){
+        Map<String, Object> result = problemService.search(searchText,pageNum);
+        return ResponseEntity.ok(result);
+    }
     @DeleteMapping("/mp/login/problems-user/delete/{problemId}")
     public ResponseEntity<?> delete(@PathVariable("problemId")Long problemId,
                                     @RequestParam("memberId")Long memberId){

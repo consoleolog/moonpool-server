@@ -18,6 +18,6 @@ public interface ProblemService {
 
     Map<String, Object> getList(Integer pageNum, String category);
 
-
+    Map<String, Object> search(String searchText, Integer pageNum);
 
 }

@@ -1,12 +1,15 @@
 package org.leo.moonpool.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.leo.moonpool.dto.AnswerDto;
 import org.leo.moonpool.dto.SalesDto;
 import org.leo.moonpool.dto.SalesListDto;
+import org.leo.moonpool.entity.Member;
 import org.leo.moonpool.entity.Problem;
 import org.leo.moonpool.handler.CoinHandler;
 import org.leo.moonpool.handler.MemberHandler;
+import org.leo.moonpool.repository.MemberRepository;
 import org.leo.moonpool.repository.ProblemRepository;
 import org.leo.moonpool.repository.SalesRepository;
 import org.leo.moonpool.service.impl.SalesService;
@@ -14,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.IntStream;
-
+@Log4j2
 @RequiredArgsConstructor
 @Service
 public class SalesServiceImpl implements SalesService {
@@ -22,36 +25,43 @@ public class SalesServiceImpl implements SalesService {
     private final SalesRepository salesRepository;
     private final CoinHandler coinHandler;
     private final MemberHandler memberHandler;
+    private final MemberRepository memberRepository;
     @Override
     public String purchase(SalesDto salesDto) {
         Optional<Problem> result = problemRepository.findById(salesDto.getProblemId());
         Problem problem = result.orElseThrow();
         Boolean validCheck = memberHandler.validCheck(salesDto.getMemberId());
         if (!validCheck){
-            return "ERROR";
+            return "VALID_ERROR";
         }
         salesRepository.save(salesDto.toEntity(salesDto));
         try{
-            coinHandler.minus(salesDto.getMemberId(),problem.getPrice());
+            String coinMsg = coinHandler.minus(salesDto.getMemberId(),problem.getPrice());
             coinHandler.plus(problem.getWriterId(),problem.getPrice());
+            return coinMsg;
         } catch (Exception e){
             return e.getMessage();
         }
-        return "SUCCESS";
     }
 
     @Override
     public String purchaseAll(SalesListDto salesListDto) {
+        log.info(salesListDto);
         SalesDto salesDto = new SalesDto();
         String coinMsg = "";
         for (Long problemId : salesListDto.getProblemIdList()) {
-            salesDto.setProblemId(problemId);
-            salesDto.setMemberId(salesListDto.getMemberId());
-            salesRepository.save(salesDto.toEntity(salesDto));
             Optional<Problem> result = problemRepository.findById(problemId);
             Problem problem = result.orElseThrow();
+            Long problemWriterId = salesRepository.findMemberIdByProblemId(problemId);
             try {
-                coinMsg = coinHandler.minus(salesListDto.getMemberId(), problem.getPrice());
+                coinMsg = coinHandler.minus(salesListDto.getMemberId(), salesListDto.getTotalPrice());
+                if (Objects.equals(coinMsg, "SUCCESS")){
+                    salesDto.setProblemId(problemId);
+                    log.info(coinMsg);
+                    salesDto.setMemberId(salesListDto.getMemberId());
+                    coinHandler.plus(problemWriterId,problem.getPrice());
+                    salesRepository.save(salesDto.toEntity(salesDto));
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -63,6 +73,9 @@ public class SalesServiceImpl implements SalesService {
     public String answerCheck(AnswerDto answerDto) {
         Optional<Problem> result = problemRepository.findById(answerDto.getProblemId());
         Problem problem = result.orElseThrow();
+        log.info(problem);
+        log.info(answerDto.getAnswer());
+        String message = "";
         Boolean validCheck = memberHandler.validCheck(answerDto.getMemberId());
         if (!validCheck){
             return "VALID_ERROR";
@@ -70,13 +83,34 @@ public class SalesServiceImpl implements SalesService {
         if(Objects.equals(problem.getAnswer(), answerDto.getAnswer())){
             try {
                 coinHandler.plus(answerDto.getMemberId(),100);
+                message = "CORRECT";
             }catch (Exception e){
                 return "ERROR";
             }
+        } else {
+            message = "INCORRECT";
         }
-        return "SUCCESS";
+        return message;
     }
-
+    @Override
+    public String purchaseCheckAll(SalesListDto salesListDto){
+        Boolean validCheck = memberHandler.validCheck(salesListDto.getMemberId());
+        String result = "SUCCESS";
+        if (!validCheck){
+            return "VALID_ERROR";
+        }
+        List<Long> problemIdList = salesListDto.getProblemIdList();
+        List<Long> purcahsedItemList = salesRepository.customFindByMemberId(salesListDto.getMemberId());
+        // 두개 중에 겹치는게 있나봐야됨
+        for (Long i : problemIdList) {
+            for (Long j : purcahsedItemList) {
+                if (Objects.equals(i, j)){
+                    result = "ALREADY_PURCHASED";
+                }
+            }
+        }
+        return result;
+    }
     @Override
     public String alreadyPurchase(SalesDto salesDto) {
         Boolean validCheck = memberHandler.validCheck(salesDto.getMemberId());

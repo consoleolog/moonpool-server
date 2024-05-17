@@ -16,4 +16,5 @@ public class MemberDataDto {
     private String intro ;
     private String educationState;
     private Integer coin;
+
 }

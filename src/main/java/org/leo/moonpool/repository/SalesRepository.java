@@ -21,5 +21,7 @@ public interface SalesRepository extends JpaRepository<Sales,Long> {
     List<?> customFindMadeList(@Param("memberId") Long memberId,@Param("offset")int offset);
     @Query(value = "SELECT COUNT (p) FROM Problem p WHERE p.writerId=:memberId")
     Long countByMemberIdForMadeList(@Param("memberId")Long memberId);
-
+    // 문제 아이디 가지고 작성자 찾는거임
+    @Query(value = "SELECT p.writerId FROM Problem p WHERE p.problemId=:problemId")
+    Long findMemberIdByProblemId(@Param("problemId")Long problemId);
 }

@@ -7,7 +7,9 @@ import org.leo.moonpool.dto.MemberDto;
 @Transactional
 public interface MemberService {
 
-    MemberDataDto getUserData(String username, Long memberId);
+    MemberDataDto getUserData(Long memberId);
+
+    String updateMemberData(MemberDataDto memberDataDto);
 
     void register(MemberDto memberDto);
 

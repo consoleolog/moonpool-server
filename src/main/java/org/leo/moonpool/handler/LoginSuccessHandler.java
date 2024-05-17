@@ -26,7 +26,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         // 일반적으로 엑세스 토큰만 사용
         String accessToken = JwtConfig.generateToken(claims, 60); //5분
         // 엑세스 토큰이 만료되면 엑세스랑 리프레쉬를 같이 보내서 새로운 엑세스 토큰 발급
-        String refreshToken = JwtConfig.generateToken(claims, 60*24);
+        String refreshToken = JwtConfig.generateToken(claims, 60);
 //        claims.put("userInfo",userDto);
         claims.put("accessToken", accessToken);
         claims.put("refreshToken",refreshToken);

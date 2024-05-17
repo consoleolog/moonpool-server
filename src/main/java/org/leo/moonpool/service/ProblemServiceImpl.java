@@ -5,7 +5,6 @@ import lombok.extern.log4j.Log4j2;
 import org.leo.moonpool.dto.ApiUser;
 import org.leo.moonpool.dto.ProblemDto;
 import org.leo.moonpool.entity.Problem;
-import org.leo.moonpool.handler.FileHandler;
 import org.leo.moonpool.handler.MemberHandler;
 import org.leo.moonpool.repository.ProblemRepository;
 import org.leo.moonpool.service.impl.ProblemService;
@@ -19,7 +18,6 @@ import java.util.stream.IntStream;
 @Service
 public class ProblemServiceImpl implements ProblemService {
     private final ProblemRepository problemRepository;
-    private final FileHandler fileHandler;
     private final MemberHandler memberHandler;
     @Override
     public String post(ProblemDto problemDto) {
@@ -127,5 +125,25 @@ public class ProblemServiceImpl implements ProblemService {
         result.put("numList",numList);
         return result;
     }
-
+    @Override
+    public Map<String, Object> search(String searchText, Integer pageNum){
+        var problemList = problemRepository.fullTextSearch(searchText,(pageNum-1)*10);
+        Long totalCount = problemRepository.countProblem(searchText);
+        int end = (int)(Math.ceil(pageNum.intValue()/10.0)) * 10; //10
+        int start = end - 9;
+        int last = (int)(Math.ceil((double) totalCount/(double) 10.0)); // 11
+        end = end < last ? end : last; // 10 < 11 ?
+        start = start < 1 ? 1 : start;
+        List<Integer> numList = IntStream.rangeClosed(start, end).boxed().toList();
+        int prev = start - 1;
+        int next = end + 1; // end + 1
+        Map<String, Object> result = new HashMap<>();
+        result.put("problemList", problemList);
+        result.put("end", end);
+        result.put("start",start);
+        result.put("prev",prev);
+        result.put("next",next);
+        result.put("numList",numList);
+        return result;
+    }
 }

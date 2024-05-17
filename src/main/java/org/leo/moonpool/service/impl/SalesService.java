@@ -18,6 +18,8 @@ public interface SalesService {
 
     String alreadyPurchase(SalesDto salesDto);
 
+    String purchaseCheckAll(SalesListDto salesListDto);
+
     Map<String, Object> getPurchasedItem(Long memberId, Integer pageNum);
 
     Map<String, Object> getMadeList(Long memberId, Integer pageNum);
