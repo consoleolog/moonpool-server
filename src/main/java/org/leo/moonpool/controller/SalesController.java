@@ -23,12 +23,15 @@ public class SalesController {
     }
     @PostMapping("/mp/sales/purchased-check")
     public ResponseEntity<String> purchasedCheckAll(@RequestBody SalesListDto salesListDto){
+        log.info(salesListDto);
         String result = salesService.purchaseCheckAll(salesListDto);
         return ResponseEntity.ok(result);
     }
     @PostMapping("/mp/sales/purchase-all")
     public ResponseEntity<?> purchaseAll(@RequestBody SalesListDto salesListDto){
         String result = salesService.purchaseAll(salesListDto);
+//        var result = salesListDto;
+//        log.info(salesListDto.getProblemIdList());
         return ResponseEntity.ok(result);
     }
     @PostMapping("/mp/sales/answer/check")
@@ -55,5 +58,15 @@ public class SalesController {
         Map<String, Object> result = salesService.getMadeList(memberId,pageNum);
         return ResponseEntity.ok(result);
     }
-
+    @GetMapping("/mp/sales/get-sales-list/{memberId}")
+    public ResponseEntity<?> getSalesList(@PathVariable("memberId")Long memberId){
+        var result = salesService.getSalesList(memberId);
+        return ResponseEntity.ok(result);
+    }
+    @GetMapping("/mp/sales/check-sales-one/{memberId}")
+    public ResponseEntity<?> checkSalesOne(@PathVariable("memberId")Long memberId,
+                                           @RequestParam("problemId")Long problemId){
+        var result = salesService.checkSalesOne(problemId,memberId);
+        return ResponseEntity.ok(result);
+    }
 }

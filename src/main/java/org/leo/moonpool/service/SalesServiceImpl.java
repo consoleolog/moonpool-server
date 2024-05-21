@@ -46,7 +46,6 @@ public class SalesServiceImpl implements SalesService {
 
     @Override
     public String purchaseAll(SalesListDto salesListDto) {
-        log.info(salesListDto);
         SalesDto salesDto = new SalesDto();
         String coinMsg = "";
         for (Long problemId : salesListDto.getProblemIdList()) {
@@ -62,7 +61,9 @@ public class SalesServiceImpl implements SalesService {
                     coinHandler.plus(problemWriterId,problem.getPrice());
                     salesRepository.save(salesDto.toEntity(salesDto));
                 }
-            } catch (Exception e) {
+
+        }
+        catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
@@ -101,9 +102,13 @@ public class SalesServiceImpl implements SalesService {
         }
         List<Long> problemIdList = salesListDto.getProblemIdList();
         List<Long> purcahsedItemList = salesRepository.customFindByMemberId(salesListDto.getMemberId());
+        System.out.println(purcahsedItemList);
         // 두개 중에 겹치는게 있나봐야됨
         for (Long i : problemIdList) {
             for (Long j : purcahsedItemList) {
+                System.out.println(i);
+                System.out.println(j);
+                System.out.println("---------------");
                 if (Objects.equals(i, j)){
                     result = "ALREADY_PURCHASED";
                 }
@@ -134,14 +139,16 @@ public class SalesServiceImpl implements SalesService {
         }
         List<?> problemList = salesRepository.customFindAll(memberId,(pageNum -1) * 10);
         Long totalCount = salesRepository.countByMemberId(memberId);
-        int end = (int)(Math.ceil(pageNum.intValue()/10.0)) * 10; //10
+        int end = (int)(Math.ceil(pageNum /10.0)) * 10; //10
         int start = end - 9;
         int last = (int)(Math.ceil((double) totalCount/(double) 10.0)); // 11
         end = end < last ? end : last; // 10 < 11 ?
         start = start < 1 ? 1 : start;
         List<Integer> numList = IntStream.rangeClosed(start, end).boxed().toList();
-        int prev = start - 1;
-        int next = end + 1; // end + 1
+        boolean prevPage = start > 1;
+        boolean nextPage = totalCount > end* 10L;
+        int prev = prevPage ? start-1 : 0;
+        int next = nextPage ? end + 1 : 0; // end + 1
         Map<String, Object> result = new HashMap<>();
         result.put("problemList", problemList);
         result.put("end", end);
@@ -160,14 +167,16 @@ public class SalesServiceImpl implements SalesService {
         }
         List<?> problemList = salesRepository.customFindMadeList(memberId,(pageNum -1) * 10);
         Long totalCount = salesRepository.countByMemberIdForMadeList(memberId);
-        int end = (int)(Math.ceil(pageNum.intValue()/10.0)) * 10; //10
+        int end = (int)(Math.ceil(pageNum /10.0)) * 10; //10
         int start = end - 9;
         int last = (int)(Math.ceil((double) totalCount/(double) 10.0)); // 11
         end = end < last ? end : last; // 10 < 11 ?
         start = start < 1 ? 1 : start;
         List<Integer> numList = IntStream.rangeClosed(start, end).boxed().toList();
-        int prev = start - 1;
-        int next = end + 1; // end + 1
+        boolean prevPage = start > 1;
+        boolean nextPage = totalCount > end* 10L;
+        int prev = prevPage ? start-1 : 0;
+        int next = nextPage ? end + 1 : 0; // end + 1
         Map<String, Object> result = new HashMap<>();
         result.put("problemList", problemList);
         result.put("end", end);
@@ -176,5 +185,25 @@ public class SalesServiceImpl implements SalesService {
         result.put("next",next);
         result.put("numList",numList);
         return result;
+    }
+    @Override
+    public List<?> getSalesList(Long memberId){
+        List<?> result = salesRepository.findSalesListByMemberId(memberId);
+        return result;
+    }
+    @Override
+    public Boolean checkSalesOne(Long problemId, Long memberId){
+        log.info(problemId);
+        log.info(memberId);
+//        // 사용자가 구매한 답지 리스트임
+        List<Long> salesList = salesRepository.findSalesListByMemberId(memberId);
+        log.info(salesList);
+        for (Long pid : salesList){
+            var result = salesRepository.findByProblemId(pid);
+            if (result.isPresent()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

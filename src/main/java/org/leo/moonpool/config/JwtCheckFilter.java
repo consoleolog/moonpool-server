@@ -65,14 +65,14 @@ public class JwtCheckFilter extends OncePerRequestFilter {
             apiUser.setDisplayName(displayName);
             apiUser.setEducationState(educationState);
             apiUser.setCoin(coin);
-            log.info(apiUser);
+//            log.info(apiUser);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(apiUser,password,apiUser.getAuthorities());
-            log.info(authenticationToken);
+//            log.info(authenticationToken);
             // 인증 완료하면 contextholder 에 userdto 를 저장
             SecurityContext context = SecurityContextHolder.createEmptyContext();
             context.setAuthentication(authenticationToken);
             SecurityContextHolder.setContext(context);
-            log.info(context);
+//            log.info(context);
             filterChain.doFilter(request, response);
             log.info("-----------------check filter end--------------------");
         } catch (Exception e){

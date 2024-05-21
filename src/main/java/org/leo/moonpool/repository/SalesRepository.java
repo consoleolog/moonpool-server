@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SalesRepository extends JpaRepository<Sales,Long> {
 
@@ -24,4 +25,13 @@ public interface SalesRepository extends JpaRepository<Sales,Long> {
     // 문제 아이디 가지고 작성자 찾는거임
     @Query(value = "SELECT p.writerId FROM Problem p WHERE p.problemId=:problemId")
     Long findMemberIdByProblemId(@Param("problemId")Long problemId);
+
+    @Query(value = "SELECT s.problemId FROM Sales s WHERE s.memberId=:memberId")
+    List<Long> findSalesListByMemberId(@Param("memberId")Long memberId);
+
+    @Query(value = "SELECT * FROM sales WHERE MATCH(problem_id) AGAINST(?1)",nativeQuery = true)
+    Object checkByProblemId(Long problem_id);
+
+    Optional<Sales> findByProblemId(Long problemId);
+
 }

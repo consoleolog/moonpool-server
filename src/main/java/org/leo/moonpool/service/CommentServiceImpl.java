@@ -19,14 +19,16 @@ public class CommentServiceImpl implements CommentService {
     public Map<String, Object> getList(Long problemId,Integer pageNum) {
         List<?> commentList = commentRepository.customFindAll(problemId,(pageNum-1)*10);
         Long totalCount = commentRepository.countByProblemId(problemId);
-        int end = (int)(Math.ceil(pageNum.intValue()/10.0)) * 10; //10
+        int end = (int)(Math.ceil(pageNum /10.0)) * 10; //10
         int start = end - 9;
         int last = (int)(Math.ceil((double) totalCount/(double) 10.0)); // 11
         end = end < last ? end : last; // 10 < 11 ?
         start = start < 1 ? 1 : start;
         List<Integer> numList = IntStream.rangeClosed(start, end).boxed().toList();
-        int prev = start - 1;
-        int next = end + 1; // end + 1
+        boolean prevPage = start > 1;
+        boolean nextPage = totalCount > end* 10L;
+        int prev = prevPage ? start-1 : 0;
+        int next = nextPage ? end + 1 : 0; // end + 1
         Map<String, Object> result = new HashMap<>();
         result.put("commentList",commentList);
         result.put("end", end);

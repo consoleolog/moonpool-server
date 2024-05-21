@@ -8,6 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @ToString
+@Table(indexes =@Index(columnList = "problemId",name="problemIdIndex"))
 @Entity
 public class Sales {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

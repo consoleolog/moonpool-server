@@ -114,8 +114,13 @@ public class ProblemServiceImpl implements ProblemService {
         end = end < last ? end : last; // 10 < 11 ?
         start = start < 1 ? 1 : start;
         List<Integer> numList = IntStream.rangeClosed(start, end).boxed().toList();
-        int prev = start - 1;
-        int next = end + 1; // end + 1
+        boolean prevPage = start > 1;
+        boolean nextPage = totalCount > end* 10L;
+        // 120 > 120 false
+        int prev = prevPage ? start-1 : 0;
+        int next = nextPage ? end + 1 : 0;
+        // end + 1 총 개시물이 120개야 그럼 페이지가 12개가 필요해 근데
+        // 120 end * 10 이 120보다
         Map<String, Object> result = new HashMap<>();
         result.put("problemList", problemList);
         result.put("end", end);
@@ -129,14 +134,15 @@ public class ProblemServiceImpl implements ProblemService {
     public Map<String, Object> search(String searchText, Integer pageNum){
         var problemList = problemRepository.fullTextSearch(searchText,(pageNum-1)*10);
         Long totalCount = problemRepository.countProblem(searchText);
-        int end = (int)(Math.ceil(pageNum.intValue()/10.0)) * 10; //10
+        int end = (int)(Math.ceil(pageNum /10.0)) * 10; //10
         int start = end - 9;
         int last = (int)(Math.ceil((double) totalCount/(double) 10.0)); // 11
-        end = end < last ? end : last; // 10 < 11 ?
-        start = start < 1 ? 1 : start;
+        end = end > last ? end : last; // 10 < 11 ?
         List<Integer> numList = IntStream.rangeClosed(start, end).boxed().toList();
-        int prev = start - 1;
-        int next = end + 1; // end + 1
+        boolean prevPage = start > 1;
+        boolean nextPage = totalCount > end* 10L;
+        int prev = prevPage ? start - 1 : 0;
+        int next = nextPage ? end + 1 : 0; // end + 1
         Map<String, Object> result = new HashMap<>();
         result.put("problemList", problemList);
         result.put("end", end);
